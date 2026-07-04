@@ -8,8 +8,11 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
-[*.{js,jsx,ts,tsx,json,yml,yaml,css,scss,html}]
+[*.{json,yml,yaml,js,ts,css,scss,html}]
 indent_size = 2
+
+[*.php]
+indent_size = 4
 
 [Makefile]
 indent_style = tab
