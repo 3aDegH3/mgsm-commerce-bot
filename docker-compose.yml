@@ -9,9 +9,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-    ports:
-      - "127.0.0.1:5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -61,6 +58,52 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
+
+    networks:
+      - mgsm-network
+
+  core-api:
+    build:
+      context: ./apps/core-api
+      dockerfile: Dockerfile
+
+    container_name: mgsm-core-api
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+
+    command:
+      - sh
+      - /app/docker/entrypoint.sh
+
+    volumes:
+      - ./apps/core-api:/app
+
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health/', timeout=3)"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
     networks:
       - mgsm-network
