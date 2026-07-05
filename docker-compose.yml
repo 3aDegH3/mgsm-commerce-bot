@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: mgsm-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "127.0.0.1:5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - mgsm-network
+
+  redis:
+    image: redis:8-alpine
+    container_name: mgsm-redis
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --save
+      - "60"
+      - "1"
+      - --loglevel
+      - warning
+
+    ports:
+      - "127.0.0.1:6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "ping"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+    networks:
+      - mgsm-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  mgsm-network:
+    driver: bridge
