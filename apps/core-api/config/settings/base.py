@@ -5,6 +5,7 @@ import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
 )
@@ -15,14 +16,20 @@ SECRET_KEY = env(
     default="unsafe-development-secret",
 )
 
+
 DEBUG = env.bool(
     "DJANGO_DEBUG",
     default=False,
 )
 
+
 ALLOWED_HOSTS = env.list(
     "DJANGO_ALLOWED_HOSTS",
-    default=["localhost", "127.0.0.1", "core-api"],
+    default=[
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0",
+    ],
 )
 
 
@@ -37,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework",
 
     "apps.common.apps.CommonConfig",
+    "apps.accounts.apps.AccountsConfig",
 ]
 
 
@@ -71,17 +79,34 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+
 ASGI_APPLICATION = "config.asgi.application"
 
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("POSTGRES_DB", default="mgsm"),
-        "USER": env("POSTGRES_USER", default="mgsm"),
-        "PASSWORD": env("POSTGRES_PASSWORD"),
-        "HOST": env("POSTGRES_HOST", default="postgres"),
-        "PORT": env.int("POSTGRES_PORT", default=5432),
+        "NAME": env(
+            "POSTGRES_DB",
+            default="mgsm",
+        ),
+        "USER": env(
+            "POSTGRES_USER",
+            default="mgsm",
+        ),
+        "PASSWORD": env(
+            "POSTGRES_PASSWORD",
+            default="mgsm",
+        ),
+        "HOST": env(
+            "POSTGRES_HOST",
+            default="postgres",
+        ),
+        "PORT": env.int(
+            "POSTGRES_PORT",
+            default=5432,
+        ),
         "CONN_MAX_AGE": 60,
         "CONN_HEALTH_CHECKS": True,
     }
@@ -116,22 +141,33 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = "fa-ir"
+LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = env(
     "APP_TIME_ZONE",
     default="Asia/Tehran",
 )
 
+
 USE_I18N = True
+
+
 USE_TZ = True
 
 
 STATIC_URL = "/static/"
+
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+
 MEDIA_URL = "/media/"
+
+
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+AUTH_USER_MODEL = "accounts.User"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
